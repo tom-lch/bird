@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"bird/pkg/spider"
 	"bird/config"
 	"bird/pkg/useGPU"
@@ -11,6 +13,10 @@ import (
 
 // 实现多线程从任务池拿去任务，多线程爬虫下载图片，多线程任务调度获取GPU资源，保障GPU满负荷运行
 func main() {
+	new :=time.Now()
+	fmt.Println(new.Format("2006-01-02 15:04:05"))
+	
+	start := time.Now().UnixNano()
 	defer func(){
 		// 关闭通道
 		config.storePools.Close()
@@ -31,4 +37,6 @@ func main() {
 		wg.Done()
 	}
 	wg.Wait()
+	end := time.Now().UnixNano()
+	fmt.Printf("cost is :%d \n", ( end-start)/1000)
 }

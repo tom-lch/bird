@@ -2,6 +2,7 @@ package spider
 
 import (
 	"time"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"bird/config"
@@ -12,19 +13,19 @@ import (
 
 // 目前有两个通道，一个是 workPool 传递下载任务， 一个是 storePool 保存下载图片的路径
 
-func GetWorkFromChan() {.
-	for url := range config.workPools {
-		go DLPhoto(url)
+func GetWorkFromChan(glb *config.Global) {
+	for url := range glb.WorkPools {
+		go DLPhoto(url, glb)
 	}
 	time.Sleep(time.Second)
-	config.storePools.Close()
+	close(glb.StorePools)
 }
 
 func CreateName() string {
-	return fmt.Sprintf("img/v%d.jpg", time.Now.Unix())
+	return fmt.Sprintf("img/v%d.jpg", time.Now().Unix())
 }
 
-func DLPhoto(url string) error {
+func DLPhoto(url string, glb *config.Global) error {
 	resp, err := http.Get(url)
 	if err != nil {
 		return err
@@ -37,6 +38,6 @@ func DLPhoto(url string) error {
 	// 在此处调用GPU去处理
 	photoname := CreateName()
 	info := &config.ImgData{Name:photoname, Content: body}
-	config.storePools <- info
+	glb.StorePools <- info
 	return ioutil.WriteFile(photoname, body, 0755)
 }

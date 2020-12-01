@@ -1,21 +1,21 @@
 package workPool
 
 import (
-	"fmt"
-	"os"
-	"bufio"
-
 	"bird/config"
+	"bufio"
+	"fmt"
+	"io"
+	"os"
 )
 
-// 从任务池中抓取到图片链接，装入到 workPool 池中 
-func GetSpiderWork() {
-	GetFromTxt(config.cfg.TestFile)
+// 从任务池中抓取到图片链接，装入到 workPool 池中
+func GetSpiderWork(glb *config.Global) {
+	GetFromTxt(glb)
 }
 
 // 使用保存在文件中的url放入到 workPool 中，后续调整成从数据库中抓取
-func GetFromTxt(fileName string) {
-	f, err := os.Open(fileName)
+func GetFromTxt(glb *config.Global) {
+	f, err := os.Open(glb.Cfg.TestFile)
 	defer f.Close()
 	if err != nil {
 		panic(err)
@@ -25,13 +25,13 @@ func GetFromTxt(fileName string) {
 	for {
 		content, isPrefix, err := reader.ReadLine()
 		fmt.Println(string(content), isPrefix, err)
-		config.workPools <- string(content)
+		glb.WorkPools <- string(content)
 		if !isPrefix {
 			totLine++
 		}
 		if err == io.EOF {
 			fmt.Println("一共有", totLine, "行内容")
-			config.workPools.Close()
+			close(glb.WorkPools)
 			break
 		}
 	}

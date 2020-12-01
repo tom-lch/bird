@@ -1,49 +1,56 @@
 package config
 
 import (
-	"os"
+	"fmt"
 	"io/ioutil"
-	"gopkg.in/yaml.v2"
+	"log"
+	"os"
+
+	yaml "gopkg.in/yaml.v2"
 )
 
-type Config struct{
-	HOST   string
-	PORT   string
-	API    string
-	TestFile   string
-	WorkPoolNum   int
-	StorePoolNum  int
+type Config struct {
+	HOST     string `yaml:"host"`
+	PORT     string `yaml:"posr"`
+	API      string `yaml:"api"`
+	TestFile string `yaml:"testfile"`
 }
 
 type ImgData struct {
-	Name string
+	Name    string
 	Content []byte
 }
 
-var workPools = make(chan string, cfg.WorkPoolNum)
-var storePools = make(chan *ImgData, cfg.StorePoolNum)
-var concal = make(chan int)
-
-var cfg *Config
-
-
-
-func init() {
-	NewConfig()
+type Global struct {
+	Cfg        *Config
+	WorkPools  chan string
+	StorePools chan *ImgData
 }
 
-func NewConfig() {
+func NewGlobal() *Global {
+	cfg := NewConfig()
+	return &Global{
+		Cfg:        cfg,
+		WorkPools:  make(chan string, 20),
+		StorePools: make(chan *ImgData, 20),
+	}
+}
+
+func NewConfig() *Config {
+	var cfg = &Config{}
 	// 读取yaml文件的信息到Config中
-	file, err := os.Open("config.yaml")
+	file, err := os.Open("./config/config.yaml")
 	if err != nil {
-		panic(err)
+		log.Fatalf("解析config.yaml读取错误: %v", err)
 	}
 	bytes, err := ioutil.ReadAll(file)
 	if err != nil {
-		panic(err)
+		log.Fatalf("读文件错误: %v", err)
 	}
-	err = yaml.Unmarshal(bytes, cfg)
-	if err != nil {
-		panic(err)
+	if err := yaml.Unmarshal(bytes, cfg); err != nil {
+		fmt.Println("解析yaml失败")
+		log.Fatalf("解析config.yaml读取错误: %v", err)
+		panic("")
 	}
+	return cfg
 }

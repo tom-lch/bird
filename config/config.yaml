@@ -1,6 +1,4 @@
-HOST: localhost
-PORT: 8868
-API: /predict/ocr_system
-TestFile: test_src.txt
-WorkPoolNum: 20
-StorePoolNum: 20
+host: localhost
+post: 8868
+api: /predict/ocr_system
+test_file: test_src.txt

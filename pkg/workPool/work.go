@@ -32,6 +32,7 @@ func GetFromTxt(glb *config.Global) {
 		if err == io.EOF {
 			fmt.Println("一共有", totLine, "行内容")
 			close(glb.WorkPools)
+			
 			break
 		}
 	}

@@ -7,7 +7,12 @@ import (
 )
 
 type Config struct{
-
+	HOST   string
+	PORT   string
+	API    string
+	TestFile   string
+	WorkPoolNum   int
+	StorePoolNum  int
 }
 
 type ImgData struct {
@@ -15,8 +20,8 @@ type ImgData struct {
 	Content []byte
 }
 
-var workPools = make(chan string, 10)
-var storePools = make(chan *ImgData, 10)
+var workPools = make(chan string, cfg.WorkPoolNum)
+var storePools = make(chan *ImgData, cfg.StorePoolNum)
 var concal = make(chan int)
 
 var cfg *Config

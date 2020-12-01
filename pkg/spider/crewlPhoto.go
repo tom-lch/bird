@@ -21,7 +21,7 @@ func GetWorkFromChan() {.
 }
 
 func CreateName() string {
-	return fmt.Sprintf("v%d.jpg", time.Now.Unix())
+	return fmt.Sprintf("img/v%d.jpg", time.Now.Unix())
 }
 
 func DLPhoto(url string) error {
@@ -34,7 +34,7 @@ func DLPhoto(url string) error {
 	if err != nil {
 		return err
 	}
-	// 探讨是否可以在此处调用GPU去处理
+	// 在此处调用GPU去处理
 	photoname := CreateName()
 	info := &config.ImgData{Name:photoname, Content: body}
 	config.storePools <- info

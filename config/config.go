@@ -13,7 +13,7 @@ type Config struct {
 	HOST     string `yaml:"host"`
 	PORT     string `yaml:"posr"`
 	API      string `yaml:"api"`
-	TestFile string `yaml:"testfile"`
+	TestFile string `yaml:"test_file"`
 }
 
 type ImgData struct {

@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"sync"
 )
 
 // 调用GPU处理图片
@@ -16,14 +15,18 @@ import (
 func GetOCRInfo(glb *config.Global) {
 	// 从 storePools 获取到img的[]byte 格式
 	// httpPostForm(ImgBase64)
-	var wg sync.WaitGroup
+	//var wg sync.WaitGroup
+	//for info := range glb.StorePools {
+	//	wg.Add(1)
+	//	// go ConnectGPUByFile(info.Name, glb)
+	//	go func(info *config.ImgData, glb *config.Global) {
+	//		httpPostForm(Byte2Base64(info.Content), glb)
+	//		wg.Wait()
+	//	}(info, glb)
+	//}
 	for info := range glb.StorePools {
-		wg.Add(1)
-		// go ConnectGPUByFile(info.Name, glb)
-		go func(info *Config.ImgData, glb *config.Global) {
-			httpPostForm(Byte2Base64(info.Content), glb)
-			wg.Wait()
-		}(info, glb)
+		httpPostForm(Byte2Base64(info.Content), glb)
+		<- glb.GPUWork
 	}
 }
 
@@ -49,6 +52,7 @@ func httpPostForm(ImgBase64 string, glb *config.Global) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	glb.GPUWork <- true
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

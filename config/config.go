@@ -25,6 +25,7 @@ type Global struct {
 	Cfg        *Config
 	WorkPools  chan string
 	StorePools chan *ImgData
+	GPUWork    chan bool
 }
 
 func NewGlobal() *Global {
@@ -33,6 +34,7 @@ func NewGlobal() *Global {
 		Cfg:        cfg,
 		WorkPools:  make(chan string, 20),
 		StorePools: make(chan *ImgData, 20),
+		GPUWork   : make(chan bool),
 	}
 }
 

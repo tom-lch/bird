@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"sync"
 	"time"
 )
 
@@ -15,13 +14,8 @@ import (
 // 目前有两个通道，一个是 workPool 传递下载任务， 一个是 storePool 保存下载图片的路径
 
 func GetWorkFromChan(glb *config.Global) {
-	var wg sync.WaitGroup
 	for url := range glb.WorkPools {
-		wg.Add(1)
-		go func(url string, glb *config.Global) {
-			DLPhoto(url, glb)
-			wg.Done()
-		}(url, glb)
+		DLPhoto(url, glb)
 	}
 	close(glb.StorePools)
 }
